@@ -1,0 +1,45 @@
+<form [formGroup]="form">
+  <div class="mb-3">
+    <label cLabel>First name</label>
+    <input cFormControl placeholder="John" formControlName="first_name" type="text" />
+  </div>
+  <div class="mb-3">
+    <label cLabel>Last name</label>
+    <input cFormControl placeholder="Doe" formControlName="last_name" type="text" />
+  </div>
+  <div class="mb-3">
+    <label cLabel>Email address</label>
+    <input cFormControl placeholder="name@example.com" formControlName="email" type="email" />
+  </div>
+  <div class="mb-3">
+    <label cLabel for="exampleFormControlInput1">Password</label>
+    <div class="position-relative">
+      <input cFormControl type="{{ showPassword ? 'text' : 'password' }}" id="password" name="password"
+        placeholder="Enter your password" formControlName="password">
+      <img src="{{ showPassword ? './assets/images/eye-hide.png' : './assets/images/eye-show.png' }}"
+        class="password-toggle" (click)="togglePasswordVisibility()">
+    </div>
+    <div class="text-red-400 text-xs mt-1" *ngIf="passwordFormField?.dirty">
+      <p class="block" [class.text-danger]="!passwordFormField?.value?.match('^(?=.*[A-Z])')"
+        [class.d-none]="passwordFormField?.value?.match('^(?=.*[A-Z])')">
+        At least one uppercase letter.
+      </p>
+      <p class="block" [class.text-danger]="!passwordFormField?.value?.match('(?=.*[a-z])')"
+        [class.d-none]="passwordFormField?.value?.match('(?=.*[a-z])')">
+        At least one lowercase letter.
+      </p>
+      <p class="block" [class.text-danger]="!passwordFormField?.value?.match('(.*[0-9].*)')"
+        [class.d-none]="passwordFormField?.value?.match('(.*[0-9].*)')">
+        At least one digit.
+      </p>
+      <p class="block" [class.text-danger]="!passwordFormField?.value?.match('(?=.*[!@#$%^&*])')"
+        [class.d-none]="passwordFormField?.value?.match('(?=.*[!@#$%^&*])')">
+        At least one special character.
+      </p>
+      <p class="block" [class.d-none]="passwordFormField?.value?.match('.{8,}')"
+        [class.text-danger]=" !(passwordFormField?.value?.match('.{8,}'))">
+        At least 8 characters long.
+      </p>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,78 @@
+<div class="bg-light dark:bg-transparent min-vh-100 d-flex flex-row align-items-center">
+  <c-container>
+    <c-row class="justify-content-center">
+      <c-col lg="7" md="9" xl="6">
+        <c-card class="mx-4">
+          <c-card-header>
+            <h1>Request New IP</h1>
+          </c-card-header>
+          <c-card-body class="p-4">
+            <form cForm [formGroup]="form" (ngSubmit)="onSubmit()">
+              <div class="mb-3">
+                <label for="">Subnet</label>
+                <select aria-label="select subnet" formControlName="subnet_id"
+                  cSelect required>
+                  <option value="">{{PLACEHOLDER.SELECT_SUBNET}}</option>
+                  @for (subnet of subnets$ | async; track subnet) {
+                  <option [value]="subnet.id">{{subnet.name}}</option>
+                  }
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="">Description*</label>
+                <input cFormControl [placeholder]="PLACEHOLDER.ENTER_DESCRIPTION" formControlName="description" required
+                  [ngClass]="{ 'is-invalid': descriptionFormField?.touched && descriptionFormField?.hasError('required') }"
+                  type="text" />
+              </div>
+              <div class="mb-3">
+                <label for="">Hostname</label>
+                <input cFormControl  [placeholder]="PLACEHOLDER.ENTER_HOSTNAME" formControlName="host_name" type="text" />
+              </div>
+              <div class="mb-3">
+                <label for="">Requester's name*</label>
+                <input cFormControl required [placeholder]="PLACEHOLDER.ENTER_REQUESTER_NAME"
+                  [ngClass]="{ 'is-invalid': requesterNameFormField?.touched && requesterNameFormField?.hasError('required') }"
+                  formControlName="requester_name" />
+              </div>
+
+              <div class="mb-3">
+                <label for="">Additional comment</label>
+                <textarea class="mb-3" cFormControl [placeholder]="PLACEHOLDER.ENTER_ADDITIONAL_COMMENT"
+                  formControlName="additional_comment"></textarea>
+              </div>
+              <div class="text-red-400 text-xs mt-1" *ngIf="descriptionFormField?.touched">
+                <p class="block" [class.text-danger]="descriptionFormField?.hasError('required')"
+                  [class.d-none]="!descriptionFormField?.hasError('required')">
+                  Description is required
+                </p>
+              </div>
+              <div class="text-red-400 text-xs mt-1" *ngIf="requesterNameFormField?.touched">
+                <p class="block" [class.text-danger]="requesterNameFormField?.hasError('required')"
+                  [class.d-none]="!requesterNameFormField?.hasError('required')">
+                  Requester's name is required
+                </p>
+              </div>
+              <c-row class="align-items-center">
+                <c-col sm="4">
+                  <button type="button" routerLink="/login" class="text-white" cButton color="info">Back</button>
+                </c-col>
+                <c-col sm="8" class="text-end">
+                  <button [disabled]="loading" type="submit" cButton color="primary">
+                    <ng-container *ngIf="!loading;else spinner">Submit</ng-container>
+                  </button>
+                </c-col>
+              </c-row>
+
+            </form>
+          </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
+  </c-container>
+</div>
+
+
+<ng-template #spinner>
+  <c-spinner aria-hidden="true" size="sm"></c-spinner>
+  Loading...
+</ng-template>

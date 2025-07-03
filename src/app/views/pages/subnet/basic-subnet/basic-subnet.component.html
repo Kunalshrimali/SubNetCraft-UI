@@ -1,0 +1,56 @@
+<c-card>
+  <c-card-body>
+    <div class="d-flex justify-content-between">
+      <h4 cCardTitle>{{cardTitle | titlecase}} {{'#'+componentID}}</h4>
+      </div>
+    <form id="input_form" class="row g-2 mb-3" cForm [formGroup]="form" (ngSubmit)="onSubmit()" ngNativeValidate>
+      <c-row class="mt-2">
+        <c-col class="col-xs-6 col-md-3">
+          <label cLabel for="inputName">Name</label>
+          <label cLabel for="inputName">*</label>
+          <input cFormControl id="inputName" (change)="onChangeName()" formControlName="subnetName" required />
+        </c-col>
+        <c-col class="col-xs-6 col-md-3">
+          <label cLabel for="inputNetworkAddr">Network Address</label>
+          <label cLabel for="inputNetworkAddr">*</label>
+          <input aria-label="Network Address" cFormControl id="inputNetworkAddr" required formControlName="network" />
+        </c-col>
+        <div class="font-monospace col-auto p-0">
+          <div style="height:2rem"></div>
+          <div>/</div>
+        </div>
+        <c-col class="col-xs-6 col-md-2 h-25">
+          <label cLabel for="inputnetworkSize">Network Size</label>
+          <label cLabel for="inputnetworkSize">*</label>
+          <input type="number" cFormControl id="inputnetworkSize" aria-label="Network Size" required formControlName="netsize" />
+        </c-col>
+        <div class="col-xs-6 col-md-3 col-lg-2 d-flex justify-content-between align-items-baseline align-self-end">
+          <button cButton class="me-3 text-white" color="info" type="submit">
+            {{'create' | titlecase}}
+          </button>
+          <button cButton color="secondary" class="me-3 text-white" (click)="reset()" type="button">
+            {{'reset' | titlecase}}
+          </button>
+          <button
+            *ngIf="!isDefault"
+            class="text-white me-3"
+            cButton
+            color="danger"
+            (click)="removeComponent()" type="button">
+            {{'remove' | titlecase}}
+          </button>
+          <!-- <c-col md="6" class="mt-2"> -->
+            <!-- <button
+              cTooltip="Export"
+              *ngIf="isEditing"
+              class="text-white cstm-btn-export"
+              cButton
+              color="secondary" >
+            Export
+          </button> -->
+          <!-- </c-col> -->
+        </div>
+      </c-row>
+    </form>
+  </c-card-body>
+</c-card>

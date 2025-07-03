@@ -1,0 +1,31 @@
+<div class="mx-5">
+  <c-navbar colorScheme="light" class="bg-light" placement="sticky-top">
+    <c-container fluid>
+      <form cForm class="d-flex" role="search">
+        <!-- <input aria-label="Search" cFormControl class="me-2" placeholder="Search" type="search">
+        <button cButton color="secondary" class="text-white">
+          <fa-icon [icon]="faSearch"></fa-icon>
+        </button> -->
+      </form>
+      <div class="d-flex align-self-end">
+        <div class=" d-grid gap-2 col-1 mr-0 align-self-end">
+          <button cButton (click)="save()" color="success" class="text-white" type="button">
+            <ng-container *ngIf="!loading;else spinner"> {{'save' | titlecase}}</ng-container>
+          </button>
+        </div>
+      </div>
+    </c-container>
+  </c-navbar>
+
+  <ng-container #container>
+  </ng-container>
+  <div class="my-2 d-flex justify-content-center">
+    <button cButton (click)="addNewSubnet()" class="text-white" color="success">{{'add new subnet' |
+      titlecase}}</button>
+  </div>
+</div>
+
+<ng-template #spinner>
+  <c-spinner aria-hidden="true" size="sm"></c-spinner>
+  Saving...
+</ng-template>

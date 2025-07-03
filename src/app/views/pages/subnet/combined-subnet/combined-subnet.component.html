@@ -1,0 +1,13 @@
+<div class="mt-4 scroll scroll4" [attr.data-subnet-target]="'csubnet' + componentID">
+  <app-basic-subnet
+    [componentID]="componentID"
+    [existingDetails]="existingBasicDetails"
+    [isEditing]="isEditing"
+    (onRemoveComponent)="onRemoveComponent($event)"
+    [isDefault]="isDefault"
+    (outBasicSubnetDetails)="onBasicSubnetDetailsSubmitted=$event"
+    (outResetClicked)="outResetClicked()"></app-basic-subnet>
+  <div class="mt-2">
+    <app-advanced-subnet-grid #advancedSubnet [subnetGrp]="subnetGrp" [componentID]="componentID" [subnetBasicDetails]="subnetBasicDetails"></app-advanced-subnet-grid>
+  </div>
+</div>

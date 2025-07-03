@@ -1,0 +1,31 @@
+<ng-container>
+  <c-container [fluid]="true" class="border-bottom px-4">
+    <button [cSidebarToggle]="sidebarId" cHeaderToggler class="btn" toggle="visible" style="margin-inline-start: -14px;"
+      aria-label="Toggle sidebar navigation">
+      <svg cIcon name="cilMenu" size="lg"></svg>
+    </button>
+    <c-header-nav class="mx-0">
+      <ng-container *ngTemplateOutlet="userDropdown" />
+    </c-header-nav>
+  </c-container>
+</ng-container>
+
+<ng-template #userDropdown>
+  <!-- <c-dropdown [popperOptions]="{ placement: 'bottom-start' }" variant="nav-item"> -->
+
+  <button
+    [cPopoverTrigger]="'hover'"
+    cButton
+    cPopover="Fix later"
+    cPopoverPlacement="bottom"
+    shape="rounded-0"
+    class="me-1 rounded-circle border-0"
+    color="secondary">
+    <c-avatar
+      [size]="'md'"
+      src="./assets/images/Profile_avatar_placeholder_large.png"
+      textColor="primary"
+      alt="User avatar" />
+  </button>
+  <!-- </c-dropdown> -->
+</ng-template>

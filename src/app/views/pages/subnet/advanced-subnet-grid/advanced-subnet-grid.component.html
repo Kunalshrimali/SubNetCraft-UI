@@ -1,0 +1,189 @@
+<div class="wrapper-subnet">
+  <c-card class="my-2 w-100">
+    <c-accordion flush="true">
+      <c-accordion-item #item0="cAccordionItem" [visible]="false">
+        <ng-template cTemplateId="accordionHeaderTemplate">
+          <button (click)="item0.toggleItem()" [collapsed]="!item0.visible" cAccordionButton>
+            Options
+          </button>
+        </ng-template>
+        <ng-template cTemplateId="accordionBodyTemplate">
+          <c-row>
+            <c-col md="6">
+              <div class="d-flex flex-wrap">
+                <c-col *ngFor="let option of options;let i = index" md="2" xl="2">
+                  <c-form-check class="m-2">
+                    <input cFormCheckInput #optionCheck id="checkOne" [checked]="option.checked" (change)="optionChanged(optionCheck.checked,option.key,i)" type="checkbox" />
+                    <label cFormCheckLabel for="checkOne">{{option.displayValue}}</label>
+                  </c-form-check>
+                </c-col>
+              </div>
+            </c-col>
+            <c-col md="6" class="mt-2">
+              <button
+                (click)="exportCurrentSubnet()"
+                cTooltip="Export"
+                *ngIf="isEditing"
+                class="text-white"
+                cButton
+                color="secondary" >
+              <fa-icon [icon]="faFileExport"></fa-icon>
+              Export
+            </button>
+            </c-col>
+          </c-row>
+
+        </ng-template>
+      </c-accordion-item>
+    </c-accordion>
+  </c-card>
+  <div id="calc-wrapper">
+    <!-- <font size="2"> -->
+    <table id="calc" class="table table-light table-bordered table-responsive">
+      <caption align="top">{{subnetBasicDetails.name}}</caption>
+
+      <thead class="thead-dark">
+        <tr>
+          <th id="subnetActions" style="display: table-cell;">Action</th>
+          <th id="subnetHeader" style="display: table-cell;">Subnet address</th>
+          <th id="netmaskHeader" style="display: none;">Netmask</th>
+          <th id="rangeHeader" style="display: table-cell;">Range of addresses</th>
+          <th id="useableHeader" style="display: table-cell;">Usable IPs</th>
+          <th id="hostsHeader" style="display: table-cell;">Hosts</th>
+          <th id="vlanHeader" class="col-md-2" style="display: table-cell;">VLAN</th>
+          <th id="vrfHeader" style="display: table-cell;">VRF</th>
+          <th id="siteHeader" style="display: table-cell;">Site</th>
+          <th id="deviceHeader" style="display: table-cell;">Device</th>
+          <th id="gatewayHeader" style="display: table-cell;">Gateway</th>
+          <th id="routableHeader" style="display: table-cell;">Routable</th>
+          <th id="masterSubnetHeader" style="display: table-cell;">Master Subnet</th>
+          <th id="subnetLocationHeader" style="display: table-cell;">Subnet Location</th>
+          <th id="businessUnitHeader" style="display: table-cell;">Business Unit</th>
+          <th id="noteHeader" colspan="100%" style="display: table-cell;">
+            Note
+            <div style="display:inline-block; float:right;"><span class="split">Split</span>/<span
+                class="join">Join</span></div>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="calcbody" #calcbody>
+        <tr id="row_10-0-0-0_17">
+          <td class="cstm_edit"></td>
+          <td class="row_address">Loading...</td>
+          <td class="row_range"></td>
+          <td class="row_usable"></td>
+          <td class="row_hosts"></td>
+          <td class="note"><label><input type="text" class="form-control shadow-none p-0"></label></td>
+          <td rowspan="1" colspan="13" class="split rotate"><span></span></td>
+          <td rowspan="14" colspan="1" class="join rotate"><span></span></td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- </font> -->
+  </div>
+  <div id="bottom_nav" class="d-flex col-md-6 col-lg-6">
+    <div class="align-top pt-1 mx-1" id="colors_word_open" *ngIf="!colorPaletteVisibility"
+      (click)="colorPaletteVisibility = !colorPaletteVisibility"><span>Change Colors &#187;</span></div>
+    <div class="mx-2" *ngIf="colorPaletteVisibility" id="color_palette">
+      @for (item of [].constructor(11); track item;let i = $index)
+      {
+      <ng-container *ngIf="i > 0">
+        <div [id]="'palette_picker_'+i" #color (click)="pickedColor(color)"></div>
+      </ng-container>
+      }
+    </div>
+    <div class="d-inline-block align-top align-top pt-1 ps-2" (click)="stopChangingColor()"
+      *ngIf="colorPaletteVisibility" id="colors_word_close">
+      <span>&#171; Stop Changing Colors</span>
+    </div>
+    <!-- <div class="d-inline-block align-top pt-1 ps-3" id="copy_url"><span>Copy Shareable URL</span></div> -->
+  </div>
+</div>
+<c-modal #editSubnetRow id="editSubnetRow">
+  <form action="" cForm [formGroup]="advancedFormFields" (submit)="onSubmitted()">
+    <c-modal-header>
+      <h5 cModalTitle>{{'Edit Subnet' + componentID | titlecase}}</h5>
+      <!-- <button cButtonClose ></button> -->
+    </c-modal-header>
+    <c-modal-body>
+      <c-row [gutter]="{g: 2}">
+        <c-col [md]>
+          <div cFormFloating>
+            <input cFormControl id="floatingInputVLAN" type="text" formControlName="VLAN" />
+            <label cLabel for="floatingInputVLAN">VLAN</label>
+          </div>
+        </c-col>
+        <c-col [md]>
+          <div cFormFloating>
+            <input cFormControl id="floatingInputVRF" type="text" formControlName="VRF" />
+            <label cLabel for="floatingInputVRF">VRF</label>
+          </div>
+        </c-col>
+      </c-row>
+      <c-row class="mt-2" [gutter]="{g: 2}">
+        <c-col [md]>
+          <div cFormFloating>
+            <input cFormControl id="floatingInputSite" type="text" formControlName="site" />
+            <label cLabel for="floatingInputSite">{{'site' | titlecase}}</label>
+          </div>
+        </c-col>
+        <c-col [md]>
+          <div cFormFloating>
+            <input cFormControl id="floatingInputDevice" type="text" formControlName="device" />
+            <label cLabel for="floatingInputDevice">{{'device' | titlecase}}</label>
+          </div>
+        </c-col>
+      </c-row>
+      <c-row class="mt-2" [gutter]="{g: 2}">
+        <c-col [md]>
+          <div cFormFloating>
+            <input cFormControl id="floatingInputGateway" type="text" formControlName="gateway" />
+            <label cLabel for="floatingInputGateway">{{'gateway' | titlecase}}</label>
+          </div>
+        </c-col>
+        <c-col [md]>
+          <div cFormFloating>
+            <select cSelect id="floatingSelectRoutable" formControlName="routable">
+              <option value=true>{{'yes' | titlecase}}</option>
+              <option value=false>{{'no' | titlecase}}</option>
+            </select>
+            <label cLabel for="floatingSelectRoutable">Routable</label>
+          </div>
+        </c-col>
+      </c-row>
+      <c-row class="mt-2" [gutter]="{g: 2}">
+        <c-col [md]>
+          <div cFormFloating>
+            <input cFormControl aria-label="Disabled input example" readOnly [disabled]=true
+              id="floatingInputMasterSubnet" type="text" formControlName="masterSubnet" />
+            <label cLabel for="floatingInputMasterSubnet">{{'master subnet' | titlecase}}</label>
+          </div>
+        </c-col>
+        <c-col [md]>
+          <div cFormFloating>
+            <input cFormControl id="floatingInputSubnetLocation" type="text" formControlName="subnetLocation" />
+            <label cLabel for="floatingInputGateway">{{'subnet location' | titlecase}}</label>
+          </div>
+        </c-col>
+      </c-row>
+      <c-row class="mt-2" [gutter]="{g: 2}">
+        <c-col [md]>
+          <div cFormFloating>
+            <input cFormControl id="floatingInputBusinessUnit" type="text" class="text-dark"
+              formControlName="businessUnit" />
+            <label cLabel for="floatingInputBusinessUnit">{{'business unit' | titlecase}}</label>
+          </div>
+        </c-col>
+        <c-col [md]>
+          <div cFormFloating>
+            <input cFormControl id="floatingInputNotes" type="text" class="text-dark" formControlName="note" />
+            <label cLabel for="floatingInputNotes">{{'notes' | titlecase}}</label>
+          </div>
+        </c-col>
+      </c-row>
+    </c-modal-body>
+    <c-modal-footer>
+      <button cButton type="submit" color="primary">Save</button>
+    </c-modal-footer>
+  </form>
+</c-modal>

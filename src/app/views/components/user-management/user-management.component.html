@@ -1,0 +1,222 @@
+<c-card class="mb-2">
+  <c-card-body>
+    <h4 cCardTitle>{{'Users' | titlecase}}</h4>
+    <c-row>
+      <c-col md="4">
+        <input cFormControl #inputSearchTerm type="text" (keyup)="search(getValue($event))" [placeholder]="PLACEHOLDER.SEARCH_USER" id="inputZip" />
+      </c-col>
+      <c-col md="2" xs="4">
+        <select aria-label="Default select example" cSelect #selectStatus (change)='onInputChange(selectStatus.value,inputSearchTerm.value)'>
+          <option value="">Status</option>
+          <option value="active">{{'active' | titlecase}}</option>
+          <option value="inactive">{{'Inactive ' | titlecase}}</option>
+        </select>
+      </c-col>
+      <c-col xs="4" md="6" class="text-end">
+        <button cButton [cModalToggle]="addUserModal.id" color="primary">
+          {{'create user' | titlecase}}
+        </button></c-col>
+    </c-row>
+  </c-card-body>
+</c-card>
+<div class="table-responsive" *ngIf="((users$ | async)?.length) && !loading;else noData">
+  <table cTable class="table" hover>
+    <thead>
+      <tr>
+        <!-- <th scope="col">#</th> -->
+        <th scope="col">{{'name' | titlecase}}</th>
+        <th scope="col">{{'email' | titlecase}}</th>
+        <th scope="col">{{'status' | titlecase}}</th>
+        <th scope="col">{{'Action' | titlecase}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users$ | async; let i = index;">
+        <!-- <td>{{i+1}}</td> -->
+        <td>{{user.first_name + ' ' + user.last_name }}</td>
+        <td>{{user.email}}</td>
+        <td>
+          <c-form-check [switch]="true">
+            <input cFormCheckInput #statusInput [checked]="user.is_active"
+              (change)="changeStatus(statusInput.checked,user._id)" type="checkbox" />
+            <label cFormCheckLabel></label>
+          </c-form-check>
+        </td>
+        <td>
+          <button size="sm" [cModalToggle]="addUserModal.id" (click)="editUser(user,user._id)"
+            class="text-white button-spacing" cButton color="info">
+            <i class="fa fa-pencil"></i>
+          </button>
+          <button type="button" [cModalToggle]="changePasswordModal.id" class="text-white button-spacing" cButton
+            color="info" size="sm">
+            <fa-icon [icon]="faKey"></fa-icon>
+          </button>
+          <button size="sm" (click)="delegateRemoval(user._id,deleteUserConfModal)" class="text-white button-spacing"
+            cButton color="danger">
+            <fa-icon [icon]="faTrashCan"></fa-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+    </tfoot>
+  </table>
+</div>
+
+<c-modal #addUserModal id="adduserModal" backdrop="static" scrollable>
+  <c-modal-header>
+    <h5 cModalTitle> {{isEditing ? ('edit user'  | titlecase ): ('create user'  | titlecase)}}</h5>
+    <button cButtonClose [cModalToggle]="addUserModal.id"></button>
+  </c-modal-header>
+  <c-modal-body>
+    <form [formGroup]="form" (ngSubmit)="saveUser()">
+      <div class="mb-3">
+        <label cLabel>First name</label>
+        <input cFormControl [placeholder]="PLACEHOLDER.ENTER_FIRST_NAME" formControlName="first_name" type="text" />
+      </div>
+      <div class="mb-3">
+        <label cLabel>Last name</label>
+        <input cFormControl [placeholder]="PLACEHOLDER.ENTER_LAST_NAME" formControlName="last_name" type="text" />
+      </div>
+      <div class="mb-3">
+        <label cLabel>Email address</label>
+        <input cFormControl [placeholder]="PLACEHOLDER.ENTER_EMAIL" formControlName="email" type="email" />
+      </div>
+      <div class="mb-3" *ngIf="!isEditing">
+        <label cLabel for="exampleFormControlInput1">Password</label>
+        <div class="position-relative">
+          <input cFormControl type="{{ showPassword ? 'text' : 'password' }}" id="password" name="password"
+          [placeholder]="PLACEHOLDER.ENTER_PASSWORD" formControlName="password">
+          <img src="{{ showPassword ? './assets/images/eye-hide.png' : './assets/images/eye-show.png' }}"
+            class="password-toggle" (click)="togglePasswordVisibility()">
+        </div>
+        <div class="text-red-400 text-xs mt-1" *ngIf="passwordFormField?.dirty">
+          <p class="block" [class.text-danger]="!passwordFormField?.value?.match('^(?=.*[A-Z])')"
+            [class.d-none]="passwordFormField?.value?.match('^(?=.*[A-Z])')">
+            At least one uppercase letter.
+          </p>
+          <p class="block" [class.text-danger]="!passwordFormField?.value?.match('(?=.*[a-z])')"
+            [class.d-none]="passwordFormField?.value?.match('(?=.*[a-z])')">
+            At least one lowercase letter.
+          </p>
+          <p class="block" [class.text-danger]="!passwordFormField?.value?.match('(.*[0-9].*)')"
+            [class.d-none]="passwordFormField?.value?.match('(.*[0-9].*)')">
+            At least one digit.
+          </p>
+          <p class="block" [class.text-danger]="!passwordFormField?.value?.match('(?=.*[!@#$%^&*])')"
+            [class.d-none]="passwordFormField?.value?.match('(?=.*[!@#$%^&*])')">
+            At least one special character.
+          </p>
+          <p class="block" [class.d-none]="passwordFormField?.value?.match('.{8,}')"
+            [class.text-danger]=" !(passwordFormField?.value?.match('.{8,}'))">
+            At least 8 characters long.
+          </p>
+        </div>
+      </div>
+      <div class="border-top ">
+        <div class="d-flex justify-content-between mt-2 position-sticky">
+          <button cButton class="text-white" type="button" (click)="resetUserForm()" color="secondary">
+            Reset
+          </button>
+          <button cButton class="text-white" [cModalToggle]="addUserModal.id" color="danger">
+            Close
+          </button>
+          <button cButton class="text-white" color="success" type="submit">{{'save' | titlecase}}</button>
+        </div>
+      </div>
+    </form>
+
+  </c-modal-body>
+</c-modal>
+
+<c-modal #deleteUserConfModal backdrop="static" id="staticBackdropModal">
+  <c-modal-header>
+    <h5 cModalTitle> {{GLOBAL_STRING_CONSTS.DELETE| titlecase}}</h5>
+    <button [cModalToggle]="deleteUserConfModal.id" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>{{GLOBAL_STRING_CONSTS.DELETE_USER_CONFIRMATION | titlecase}}</c-modal-body>
+  <c-modal-footer>
+    <button [cModalToggle]="deleteUserConfModal.id" cButton color="secondary">
+      {{GLOBAL_STRING_CONSTS.CANCEL | titlecase}}
+    </button>
+    <button cButton color="primary" type="button" (click)="removeUser(deleteUserConfModal)">{{GLOBAL_STRING_CONSTS.YES |
+      titlecase}}</button>
+  </c-modal-footer>
+</c-modal>
+
+<ng-template #noData>
+  <c-card class="text-center mb-4">
+    <c-card-body>
+      <h5 cCardTitle>No Data Found</h5>
+    </c-card-body>
+  </c-card>
+</ng-template>
+
+<c-modal #changePasswordModal id="changePasswordModal" backdrop="static" scrollable>
+  <c-modal-header>
+    <h5 cModalTitle>{{'Change password' | titlecase}}</h5>
+    <button cButtonClose [cModalToggle]="changePasswordModal.id"></button>
+  </c-modal-header>
+  <c-modal-body>
+    <form [formGroup]="passwordForm" (ngSubmit)="savePassword()">
+      <div class="mb-3">
+        <label cLabel for="exampleFormControlInput1">New password</label>
+        <div class="position-relative">
+          <input cFormControl type="{{ showPassword ? 'text' : 'password' }}" name="new_password"
+            [placeholder]="PLACEHOLDER.ENTER_PASSWORD" formControlName="new_password">
+          <img src="{{ showPassword ? './assets/images/eye-hide.png' : './assets/images/eye-show.png' }}"
+            class="password-toggle" (click)="togglePasswordVisibility()">
+        </div>
+        <div class="text-red-400 text-xs mt-1" *ngIf="passwordChangeFormField?.dirty">
+          <p class="block" [class.text-danger]="!passwordChangeFormField?.value?.match('^(?=.*[A-Z])')"
+            [class.d-none]="passwordChangeFormField?.value?.match('^(?=.*[A-Z])')">
+            At least one uppercase letter.
+          </p>
+          <p class="block" [class.text-danger]="!passwordChangeFormField?.value?.match('(?=.*[a-z])')"
+            [class.d-none]="passwordChangeFormField?.value?.match('(?=.*[a-z])')">
+            At least one lowercase letter.
+          </p>
+          <p class="block" [class.text-danger]="!passwordChangeFormField?.value?.match('(.*[0-9].*)')"
+            [class.d-none]="passwordChangeFormField?.value?.match('(.*[0-9].*)')">
+            At least one digit.
+          </p>
+          <p class="block" [class.text-danger]="!passwordChangeFormField?.value?.match('(?=.*[!@#$%^&*])')"
+            [class.d-none]="passwordChangeFormField?.value?.match('(?=.*[!@#$%^&*])')">
+            At least one special character.
+          </p>
+          <p class="block" [class.d-none]="passwordChangeFormField?.value?.match('.{8,}')"
+            [class.text-danger]=" !(passwordChangeFormField?.value?.match('.{8,}'))">
+            At least 8 characters long.
+          </p>
+        </div>
+        <label cLabel for="exampleFormControlInput1">Confirm password</label>
+        <div class="position-relative">
+          <input cFormControl type="{{ showPassword ? 'text' : 'password' }}" name="confirm_password"
+          [placeholder]="PLACEHOLDER.CONFIRM_PASSWORD" formControlName="confirm_password">
+          <img src="{{ showConfirmPassword ? './assets/images/eye-hide.png' : './assets/images/eye-show.png' }}"
+            class="password-toggle" (click)="toggleConfirmPasswordVisibility()">
+        </div>
+        <div class="text-red-400 text-xs mt-1" *ngIf="confirmPasswordChangeFormField?.dirty">
+          <p class="block" [class.text-danger]="passwordForm.hasError('PasswordNoMatch')"
+            [class.d-none]="!passwordForm.hasError('PasswordNoMatch')">
+            Passwords do not match
+          </p>
+        </div>
+      </div>
+      <div class="border-top ">
+        <div class="d-flex justify-content-between mt-2 position-sticky">
+          <button cButton class="text-white" [cModalToggle]="changePasswordModal.id" color="danger">
+            Close
+          </button>
+          <button cButton class="text-white" type="button" (click)="resetChangePasswordForm()" color="secondary">
+            Reset
+          </button>
+          <button cButton class="text-white" color="success" type="submit">{{'save' | titlecase}}</button>
+        </div>
+
+      </div>
+
+    </form>
+
+  </c-modal-body>
+</c-modal>
